@@ -1,0 +1,38 @@
+<!doctype html>
+<html ng-app="storyteller">
+    <head>
+        <meta charset="utf-8">
+        <title>Story Teller</title>
+        <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+        <style>
+            nav {
+                background-color: lightblue;
+                border-bottom: 2px solid grey;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-default" ng-controller="IndexController">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">Storyteller</a>
+                    <button class="btn btn-primary" ng-click="navigateToHome()">Home</button>
+                    <button class="btn" ng-click="navigateToSignIn()">Sign in</button>
+                </div>
+            </div>
+        </nav>
+        <div ng-view>
+        </div>
+        <script src="vendor/jquery/dist/jquery.min.js"></script>
+        <script src="vendor/bootstrap/bootstrap.min.js"></script>
+        <script src="vendor/angular/angular.min.js"></script>
+        <script src="vendor/angular-route/angular-route.min.js"></script>
+        <script src="app.js"></script>
+        <script src="Controllers/HomeController.js"></script>
+        <script src="Controllers/IndexController.js"></script>
+        <script src="Controllers/ReaderController.js"></script>
+        <script src="Controllers/WriterController.js"></script>
+        <base href='/'>
+    </body>
+</html>
