@@ -46,7 +46,7 @@ module.exports = function(app){
     
     //Create a new user
     app.post('/api/user',function(req,res){
-        if(!doesUserExist(req.body.username)){
+        if(!userAlreadyExists(req.body.username)){
             User.create({
                 username:req.body.username,
                 password:req.body.password,
@@ -142,4 +142,15 @@ module.exports = function(app){
     
     ---------------------------------------------------------------------------
     */
+    
+    var findUserByUsername = function(uname){
+        var query = User.findOne({username:uname});  //usernames should be unique, therefore findOne should always get the desired user
+        query.exec(function(error,doc){
+            if(error){
+                console.log(error);
+            } else {
+                return doc; //return promise object that should be a user or null
+            }
+        });
+    }
 }
