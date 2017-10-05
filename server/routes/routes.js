@@ -74,7 +74,7 @@ module.exports = function(app){
         } else {
             res.send("Username is not unique!");
         };
-    };
+    });
     
     /*
     ---------------------------------------------------------------------------
