@@ -5,9 +5,10 @@ var rootPath = path.normalize(__dirname);
 var mongoose = require('mongoose');
 var port = 3030;
 var bodyParser = require('body-parser');
+var CONFIG = require('./config.json');
 
 
-mongoose.connect('mongodb://localhost/app');
+mongoose.connect(CONFIG.mongo_uri);
 var db = mongoose.connection;
 db.on('error',console.error.bind(console,'connection error:'));
 db.once('open',function(){
@@ -22,15 +23,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 
-
-/*
-app.get('/users',function(req,res){
-    mongoose.model('User').find(function(err,users){
-        res.send(users);
-    });
-});*/
-
 require('./server/routes/routes.js')(app);
-app.listen(port);
+app.listen(process.env.PORT || port);
 
 console.log('Listening on port ' + port);
