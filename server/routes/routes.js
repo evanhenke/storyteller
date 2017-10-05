@@ -1,20 +1,3 @@
-/*var userController = require('../controllers/user.server.controller.js');
-var mongoose = require('mongoose');
-
-module.exports = function(app){
-    app.get('/something',function(req,res){
-        res.send('buttholes!');
-    });
-    
-    app.post('/posting',function(req,res){
-        return userController.create(req,res);
-    });
-    
-   /* app.get('/getting',function(req,res){
-        
-    });
-};*/
-
 var User = require('../schemas/UserSchema.js');
 var Book = require('../schemas/BookSchema.js');
 
@@ -63,48 +46,35 @@ module.exports = function(app){
     
     //Create a new user
     app.post('/api/user',function(req,res){
-        var usernameAlreadyExists = false;
-        User.find(function(error,users){
-            if(error){
-                console.log(error);
-                res.send(error);
-            } else {
-                for(var i = 0;i<users.length;i++){
-                    if(users[i].username===req.body.username){
-                        usernameAlreadyExists = true;
-                    }
-                }
-            }
-        }).then(function(){
-            if(!usernameAlreadyExists){
-                User.create({
-                    username:req.body.username,
-                    password:req.body.password,
-                    firstname:req.body.firstname,
-                    lastname:req.body.lastname
-                }, function(error,user){
-                    if (error){
-                        res.send(error);
-                    } else {
-                        User.find(function(error,users){
-                            if(error) {
-                                res.send(error)
-                            } else {
-                                var returnUsers = [];
-                                for(var i=0;i<users.length;i++){
-                                    if (users[i].username === req.body.username){
-                                        returnUsers.push(users[i]);
-                                    }
+        if(!doesUserExist(req.body.username)){
+            User.create({
+                username:req.body.username,
+                password:req.body.password,
+                firstname:req.body.firstname,
+                lastname:req.body.lastname
+            }, function(error,user){
+                if (error){
+                    res.send(error);
+                } else {
+                    User.find(function(error,users){
+                        if(error) {
+                            res.send(error)
+                        } else {
+                            var returnUsers = [];
+                            for(var i=0;i<users.length;i++){
+                                if (users[i].username === req.body.username){
+                                    returnUsers.push(users[i]);
                                 }
-                                res.json(returnUsers);
                             }
-                        })
-                    }
-                });
-            } else {
-                res.send("Username is not unique!");
-        }});
-    });
+                            res.json(returnUsers);
+                        }
+                    })
+                }
+            });
+        } else {
+            res.send("Username is not unique!");
+        };
+    };
     
     /*
     ---------------------------------------------------------------------------
@@ -165,4 +135,25 @@ module.exports = function(app){
             }
         });
     });
+    /*
+    ---------------------------------------------------------------------------
+    
+    Non API methods
+    
+    ---------------------------------------------------------------------------
+    */
+    var doesUserExist(username){
+        User.find(function(error,users){
+            if(error){
+                console.log(error);
+            } else {
+                for(var i = 0;i<users.length;i++){
+                    if(users[i]===username){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    };
 }
