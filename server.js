@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var CONFIG = require('./config.json');
 
 
-mongoose.connect(CONFIG.mongo_uri);
+mongoose.connect(CONFIG.mongo_uri,{useMongoClient:true});
 var db = mongoose.connection;
 db.on('error',console.error.bind(console,'connection error:'));
 db.once('open',function(){
