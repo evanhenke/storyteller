@@ -74,7 +74,7 @@ module.exports = function(app){
         } else {
             res.send("Username is not unique!");
         };
-    };
+    });
     
     /*
     ---------------------------------------------------------------------------
@@ -142,18 +142,4 @@ module.exports = function(app){
     
     ---------------------------------------------------------------------------
     */
-    var doesUserExist(username){
-        User.find(function(error,users){
-            if(error){
-                console.log(error);
-            } else {
-                for(var i = 0;i<users.length;i++){
-                    if(users[i]===username){
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-    };
 }
