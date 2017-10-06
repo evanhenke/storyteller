@@ -27,53 +27,38 @@ module.exports = function(app){
     
     //Get user by username
     app.get('/api/user/:username',function(req,res){
-        User.find(function(error,user){
-            if(error){
-                console.log('Error of ', error);
-                res.send(error);
-            } else {
-                console.log('successful get');
-                var users = [];
-                for (var i = 0;i<user.length;i++){
-                    if(user[i].username === req.params.username){
-                        users.push(user[i]);
-                    }
-                }
-                res.json(users);
-            }
+        findUserByUsername(req.params.username).then(function(data){
+            res.json(data);
+        },function(error){
+            handleError(error);
         });
     });
     
     //Create a new user
     app.post('/api/user',function(req,res){
-        if(!userAlreadyExists(req.body.username)){
-            User.create({
-                username:req.body.username,
-                password:req.body.password,
-                firstname:req.body.firstname,
-                lastname:req.body.lastname
-            }, function(error,user){
-                if (error){
-                    res.send(error);
-                } else {
-                    User.find(function(error,users){
-                        if(error) {
-                            res.send(error)
-                        } else {
-                            var returnUsers = [];
-                            for(var i=0;i<users.length;i++){
-                                if (users[i].username === req.body.username){
-                                    returnUsers.push(users[i]);
-                                }
-                            }
-                            res.json(returnUsers);
-                        }
-                    })
-                }
-            });
-        } else {
-            res.send("Username is not unique!");
-        };
+        findUserByUsername(req.body.username).then(function(data){
+            if(data.length<1){
+                User.create({
+                    username:req.body.username,
+                    password:req.body.password,
+                    firstname:req.body.firstname,
+                    lastname:req.body.lastname
+                }, function(error,user){
+                    if (error){
+                        res.send(error);
+                    } else {
+                        findUserByUsername(user.username).then(function(u){
+                            res.json(u);
+                        },function(error){
+                            handleError(error);
+                        });
+                    }
+                });
+            } else {
+                console.log(data);
+                res.send("User already exists");
+            }
+        });
     });
     
     /*
@@ -144,13 +129,27 @@ module.exports = function(app){
     */
     
     var findUserByUsername = function(uname){
-        var query = User.findOne({username:uname});  //usernames should be unique, therefore findOne should always get the desired user
-        query.exec(function(error,doc){
+        var query = User.find({username:uname});  //usernames should be unique, therefore findOne should always get the desired user
+        return query.exec(function(error,doc){
             if(error){
                 console.log(error);
-            } else {
-                return doc; //return promise object that should be a user or null
-            }
+            } 
         });
+    }
+    
+    app.post('/api/wtf',function(req,res){
+        findUserByUsername(req.body.username).then(function(data){
+            if(data===null){
+                console.log("poop");
+            } else {
+                console.log(data);
+            }
+        },function(error){
+            console.log("wtfm8 error, dis y: " + error);
+        });
+    });
+    
+    var handleError = function(error){
+        console.log("Error: " + error);
     }
 }
