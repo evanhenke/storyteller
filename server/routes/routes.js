@@ -1,5 +1,6 @@
 var User = require('../schemas/UserSchema.js');
 var Book = require('../schemas/BookSchema.js');
+var Page = require('../schemas/PageSchema.js');
 
 module.exports = function(app){
     /*
@@ -86,40 +87,92 @@ module.exports = function(app){
     
     //get all books by an author's username
     app.get('/api/book/:username',function(req,res){
-        User.find(function(error,books){
-            if (error) {
-                res.send(error);
-            } else {
-                var authorBooks = [];
-                for (var i = 0;i<books.length;i++) {
-                    if (books[i].author.username===req.params.username){
-                        authorBooks.push(books[i]);
+        findUserByUsername(req.params.username)
+            .then(function(data){
+                Book.find({authorId:data._id}).exec(function(error,response){
+                    if(error){
+                        handleError(error);
+                    } else {
+                        console.log("req.params.username: " + req.params.username);
+                        console.log("data: " + data);
+                        console.log("response: " +  response);
+                        res.json(response);
                     }
+                });
+            },function(error){
+                handleError(error);
+            });
+    });
+    
+    app.post('/api/book/:username',function(req,res){
+        findUserByUsername(req.params.username).then(function(data){
+            console.log(data);
+            Book.create({
+                title:req.body.title,
+                authorId:data[0]._id,
+                rating:req.body.rating,
+            },function(error,book){
+                if(error){
+                    handleError(error);
+                } else {
+                    res.json(book);
                 }
-                res.json(authorBooks);
+            })
+        },function(error){
+            handleError(error);
+        });
+    });
+    
+    /*
+    ---------------------------------------------------------------------------
+    
+    Page Related API
+    
+    ---------------------------------------------------------------------------
+    */
+    app.get('/api/book/pages/:id',function(req,res){
+        Page.find({bookId:req.params.id},function(error,pages){
+            if(error){
+                handleError(error,res);
+            } else {
+                var array = [];
+                for (var i = 0;i<pages.length;i++){
+                    array.push(pages[i]);
+                }
+                res.send(array);
             }
         });
     });
     
-    app.post('/api/book/:username',function(req,res){
-        console.log(User.find({username:req.params.username}).select("username"));
-        Book.create({
-            title:req.body.title,
-            author:User.find({username:req.params.username},function(error,users){
-                if(error){
-                    res.send(error);
-                }
-            })._id,
-            pages:req.body.pages,
-            length:req.body.pages.length
-        },function(error,book){
-            if(error){
-                res.send(error);
-            } else {
-                res.json(book);
-            }
+    app.post('/api/book/pages',function(req,res){
+        findBookById(req.body.bookid).then(function(data){
+            res.send(data);
+        },function(error){
+            handleError(error,res);
         });
+        /*
+        Book.find({bookId:req.body.id},function(error,pages){
+            if(error){
+                handleError(error,res);
+            }
+            console.log(pages);
+        }).then(function(data){
+            Page.create({
+                bookId:req.body.id,
+                pageNumber:pages.length+1,
+                text:req.body.text
+            },function(error,page){
+                if(error){
+                    handleError(error,res);
+                } else {
+                    res.json(page);
+                }
+            })
+        },function(error){
+            handleError(error,res);
+        });*/
     });
+    
     /*
     ---------------------------------------------------------------------------
     
@@ -129,27 +182,38 @@ module.exports = function(app){
     */
     
     var findUserByUsername = function(uname){
-        var query = User.find({username:uname});  //usernames should be unique, therefore findOne should always get the desired user
+        var query = User.find({username:uname});
         return query.exec(function(error,doc){
             if(error){
                 console.log(error);
             } 
         });
-    }
+    };
     
-    app.post('/api/wtf',function(req,res){
-        findUserByUsername(req.body.username).then(function(data){
-            if(data===null){
-                console.log("poop");
-            } else {
-                console.log(data);
+    var findUserById = function(id){
+        var query = User.find({_id:id});
+        return query.exec(function(error,doc){
+            if(error){
+                handleError(error);
             }
-        },function(error){
-            console.log("wtfm8 error, dis y: " + error);
         });
-    });
+    };
+    
+    var findBookById = function(id){
+        var query = Book.find({_id:id});
+        return query.exec(function(error){
+            if(error){
+                handleError(error);
+            }
+        });
+    };
     
     var handleError = function(error){
         console.log("Error: " + error);
-    }
+    };
+    
+    var handleError = function(error,responseObject){
+        handleError(error);
+        responseObject.send(error);
+    };
 }
