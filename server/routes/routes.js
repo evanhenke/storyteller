@@ -38,7 +38,7 @@ module.exports = function(app){
     //Create a new user
     app.post('/api/user',function(req,res){
         findUserByUsername(req.body.username).then(function(data){
-            if(data.length<1){
+            if(data==null){
                 User.create({
                     username:req.body.username,
                     password:req.body.password,
@@ -88,13 +88,13 @@ module.exports = function(app){
     //get all books by an author's username
     app.get('/api/book/:username',function(req,res){
         findUserByUsername(req.params.username)
-            .then(function(data){
-                Book.find({authorId:data._id}).exec(function(error,response){
+            .then(function(user){
+            console.log("user.username " + user.username);
+            console.log("user._id " + user._id);
+                Book.find({authorId:user._id}).exec(function(error,response){
                     if(error){
                         handleError(error);
                     } else {
-                        console.log("req.params.username: " + req.params.username);
-                        console.log("data: " + data);
                         console.log("response: " +  response);
                         res.json(response);
                     }
@@ -182,7 +182,7 @@ module.exports = function(app){
     */
     
     var findUserByUsername = function(uname){
-        var query = User.find({username:uname});
+        var query = User.findOne({username:uname});
         return query.exec(function(error,doc){
             if(error){
                 console.log(error);
@@ -191,7 +191,7 @@ module.exports = function(app){
     };
     
     var findUserById = function(id){
-        var query = User.find({_id:id});
+        var query = User.findOne({_id:id});
         return query.exec(function(error,doc){
             if(error){
                 handleError(error);
@@ -200,7 +200,7 @@ module.exports = function(app){
     };
     
     var findBookById = function(id){
-        var query = Book.find({_id:id});
+        var query = Book.findOne({_id:id});
         return query.exec(function(error){
             if(error){
                 handleError(error);
