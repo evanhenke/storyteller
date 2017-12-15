@@ -5,40 +5,34 @@ var Page = require('../schemas/PageSchema.js');
 module.exports = function(app){
     /*
     ---------------------------------------------------------------------------
-    
+
     User Related API
-    
+
     ---------------------------------------------------------------------------
     */
-    
-    //Get all users
+
+    //Get all users. Why ever use this?
     app.get('/api/user',function(req,res){
-        User.find(function(error,user){
+        User.find(function(error,users){
             if (error){
                 res.send(error);
             } else {
-                var users = [];
-                for(var i = 0;i<user.length;i++){
-                    users.push(user[i]);
-                }
                 res.json(users);
             }
         })
     });
-    
+
     //Get user by username
     app.get('/api/user/:username',function(req,res){
-        findUserByUsername(req.params.username).then(function(data){
-            res.json(data);
+        User.findByUsername(req.params.username).then(function(user){
+            res.json(user);
         },function(error){
             handleError(error);
         });
     });
-    
+
     //Create a new user
     app.post('/api/user',function(req,res){
-        findUserByUsername(req.body.username).then(function(data){
-            if(data==null){
                 User.create({
                     username:req.body.username,
                     password:req.body.password,
@@ -48,68 +42,53 @@ module.exports = function(app){
                     if (error){
                         res.send(error);
                     } else {
-                        findUserByUsername(user.username).then(function(u){
+                        User.findByUsername(user.username).then(function(u){
                             res.json(u);
                         },function(error){
                             handleError(error);
                         });
                     }
                 });
-            } else {
-                console.log(data);
-                res.send("User already exists");
-            }
-        });
     });
-    
+
     /*
     ---------------------------------------------------------------------------
-    
+
     Book Related API
-    
+
     ---------------------------------------------------------------------------
     */
-    
+
     //get all books... not sure why anyone would do this, it'd be a huge number
     app.get('/api/book',function(req,res){
         Book.find(function(error,books){
             if(error){
                 res.send(error);
             } else {
-                var getValues = [];
-                for (var i = 0;i<books.length;i++){
-                    getValues.push(books[i]);
-                }
-                res.json(getValues);
+                res.json(books);
             }
         });
     });
-    
+
     //get all books by an author's username
     app.get('/api/book/:username',function(req,res){
-        findUserByUsername(req.params.username)
+        User.findByUsername(req.params.username)
             .then(function(user){
-            console.log("user.username " + user.username);
-            console.log("user._id " + user._id);
-                Book.find({authorId:user._id}).exec(function(error,response){
-                    if(error){
-                        handleError(error);
-                    } else {
-                        console.log("response: " +  response);
-                        res.json(response);
-                    }
+                Book.findByAuthorId(user._id).then(function(books){
+                    res.json(books);
+                },function(error){
+                    handleError(error,res);
                 });
             },function(error){
-                handleError(error);
+                handleError(error,res);
             });
     });
-    
-    app.post('/api/book/:username',function(req,res){
-        findUserByUsername(req.params.username).then(function(data){
-            console.log(data);
+
+    app.post('/api/book',function(req,res){
+        User.findByUsername(req.body.username).then(function(author){
             Book.create({
                 title:req.body.title,
-                authorId:data[0]._id,
+                authorId:author._id,
                 rating:req.body.rating,
             },function(error,book){
                 if(error){
@@ -117,101 +96,64 @@ module.exports = function(app){
                 } else {
                     res.json(book);
                 }
-            })
+            });
         },function(error){
             handleError(error);
         });
     });
-    
+
     /*
     ---------------------------------------------------------------------------
-    
+
     Page Related API
-    
+
     ---------------------------------------------------------------------------
     */
-    app.get('/api/book/pages/:id',function(req,res){
-        Page.find({bookId:req.params.id},function(error,pages){
-            if(error){
+    app.get('/api/book/:id/pages',function(req,res){
+        Page.findByBookId(id)
+            .then(function(book){
+                res.json(book);
+            },function(error){
                 handleError(error,res);
-            } else {
-                var array = [];
-                for (var i = 0;i<pages.length;i++){
-                    array.push(pages[i]);
-                }
-                res.send(array);
-            }
-        });
+            });
     });
-    
+
     app.post('/api/book/pages',function(req,res){
-        findBookById(req.body.bookid).then(function(data){
-            res.send(data);
-        },function(error){
-            handleError(error,res);
-        });
-        /*
-        Book.find({bookId:req.body.id},function(error,pages){
-            if(error){
+        Book.findById(req.body.id)
+            .then(function(book){
+                Page.findByBookId(book._id)
+                    .then(function(pages){
+                        Page.create({
+                            bookId:book._id,
+                            pageNumber:pages.length+1,
+                            text:req.body.pageText
+                        },function(error,newPage){
+                            if(error){
+                                handleError(error,res);
+                            } else {
+                                res.json(newPage);
+                            }
+                        });
+                    },function(error){
+                        handleError(error,res);
+                    });
+            },function(error){
                 handleError(error,res);
-            }
-            console.log(pages);
-        }).then(function(data){
-            Page.create({
-                bookId:req.body.id,
-                pageNumber:pages.length+1,
-                text:req.body.text
-            },function(error,page){
-                if(error){
-                    handleError(error,res);
-                } else {
-                    res.json(page);
-                }
-            })
-        },function(error){
-            handleError(error,res);
-        });*/
-    });
-    
+            });
+        });
+
     /*
     ---------------------------------------------------------------------------
-    
+
     Non API methods
-    
+
     ---------------------------------------------------------------------------
     */
-    
-    var findUserByUsername = function(uname){
-        var query = User.findOne({username:uname});
-        return query.exec(function(error,doc){
-            if(error){
-                console.log(error);
-            } 
-        });
-    };
-    
-    var findUserById = function(id){
-        var query = User.findOne({_id:id});
-        return query.exec(function(error,doc){
-            if(error){
-                handleError(error);
-            }
-        });
-    };
-    
-    var findBookById = function(id){
-        var query = Book.findOne({_id:id});
-        return query.exec(function(error){
-            if(error){
-                handleError(error);
-            }
-        });
-    };
-    
+
     var handleError = function(error){
         console.log("Error: " + error);
     };
-    
+
     var handleError = function(error,responseObject){
         handleError(error);
         responseObject.send(error);
