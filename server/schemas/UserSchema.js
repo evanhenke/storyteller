@@ -10,9 +10,13 @@ var userSchema = new Schema({
         unique:true,
         uniqueCaseInsensitive:true,
         match:[
-            "[a-zA-Z0-9]",
+            new RegExp("[a-zA-Z0-9]"),
             "Username only allows letters and numbers!"
         ]
+    },
+    usernameLowerCase: {
+        type:String,
+        lowercase:true
     },
     password: {
         type:String,
@@ -20,7 +24,7 @@ var userSchema = new Schema({
         maxlength:30,
         minlength:8,
         match:[
-            "[a-zA-Z0-9!@#$%^&*_+=-]",
+            new RegExp("[a-zA-Z0-9!@#$%^&*_+=-]"),
             "Password only allows letters, numbers, and the following characters: !,@,#,$,%,^,&,*,_,+,=,- "
         ]
     },
@@ -28,7 +32,7 @@ var userSchema = new Schema({
         type:String,
         required:true,
         match:[
-            "[a-zA-Z]",
+            new RegExp("[a-zA-Z]"),
             "First name only allows letters!"
         ]
     },
@@ -36,7 +40,7 @@ var userSchema = new Schema({
         type:String,
         required:true,
         match:[
-            "[a-zA-Z]",
+            new RegExp("[a-zA-Z]"),
             "Last name only allows letters!"
         ]
     },
@@ -49,16 +53,11 @@ var userSchema = new Schema({
 userSchema.plugin(uniqueValidator);
 
 userSchema.statics.findByUsername = function(username){
-    return this.findOne({username:username},
-        function(error){
-            console.log(error);
-        });
-};
-
-userSchema.statics.findById = function(id){
-    return this.findOne({_id:id},
-        function(error){
-            console.log(error);
+    return this.findOne({usernameLowerCase:username.toLowerCase()},
+        function(error,result){
+            if(error){
+                console.log(error);
+            }
         });
 };
 

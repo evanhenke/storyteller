@@ -7,7 +7,7 @@ var bookSchema = new Schema({
         required:true,
         maxlength:100,
         match:[
-            "[a-zA-Z0-9!@#$%^&*_+=\"'-]",
+            new RegExp("[a-zA-Z0-9!@#$%^&*_+=\"'-]"),
             "Title only allows letters, numbers, and the following characters: !,@,#,$,%,^,&,*,_,+,=,-,\", and '"
         ]
     },
@@ -30,7 +30,9 @@ var bookSchema = new Schema({
 bookSchema.statics.findById = function(id){
     return this.findOne({_id:id},
         function(error){
-            console.log(error);
+            if(error){
+                console.log(error);
+            }
         });
 };
 
@@ -38,7 +40,9 @@ bookSchema.statics.findById = function(id){
 bookSchema.statics.findByTitle = function(title){
     return this.find({title:title},
         function(error){
-            console.log(error);
+            if(error){
+                console.log(error);
+            }
         });
 };
 
@@ -46,7 +50,9 @@ bookSchema.statics.findByTitle = function(title){
 bookSchema.statics.findByAuthorId = function(authorId){
     return this.find({authorId:authorId},
         function(error){
-            console.log(error);
+            if(error){
+                console.log(error);
+            }
         });
 };
 
