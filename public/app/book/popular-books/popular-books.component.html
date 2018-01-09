@@ -1,0 +1,18 @@
+<div class='container'>
+    <div class='row'>
+        <div *ngFor='let book of books' class='col'>
+            <div class='card'>
+                <img class='card-img-top' [src]='book.imageUrl' [style.height.px]='imageSize' [style.width.px]='imageSize'>
+                <div class='card-body'>
+                    <h4 class='card-title'>{{book.title}}</h4>
+                    <p class='card-text'>{{book.decription}}</p>
+                    <ul>
+                        <li>AuthorID: {{book.authorId}}</li>
+                        <li>BookID: {{book.id}}</li>
+                        <li>Rating: {{book.rating}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

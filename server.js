@@ -15,7 +15,7 @@ db.once('open',function(){
     console.log('connected to mongodb!');
 });
 
-app.use(express.static(rootPath + '/public'));
+app.use(express.static(rootPath + '/public/app'));
 app.use('/bootstrap',express.static(rootPath + '/node_modules/bootstrap/dist'));
 app.use(bodyParser.urlencoded({
    extended: true
@@ -28,4 +28,3 @@ require('./server/routes/routes.js')(app);
 app.listen(process.env.PORT || port);
 
 console.log('Listening on port ' + port);
-console.log('rootPath is ' + rootPath);

@@ -4,7 +4,8 @@
   "description": "Everyone has a story to tell",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ng serve && node server"
   },
   "author": "Evan Henke",
   "license": "ISC",
@@ -23,6 +24,8 @@
     "body-parser": "^1.17.2",
     "bootstrap": "^4.0.0-alpha.6",
     "express": "^4.15.3",
+    "fs": "0.0.1-security",
+    "graceful-fs": "^4.1.11",
     "mongoose": "^4.11.4",
     "mongoose-unique-validator": "^1.0.6",
     "nodemon": "^1.14.7"

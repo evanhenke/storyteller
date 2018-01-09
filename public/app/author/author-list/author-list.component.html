@@ -17,13 +17,15 @@
                     <tr>
                         <th scope='col'>Author ID</th>
                         <th scope='col'>Name</th>
+                        <th scope='col'>Username</th>
                         <th scope='col'></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor='let author of authorList'>
                         <th>{{author.id}}</th>
-                        <th>{{author.name}}</th>
+                        <th>{{author.firstName + " " + author.lastName}}</th>
+                        <th>{{author.username}}</th>
                         <th><button class='btn btn-secondary'>View details</button></th>
                     </tr>
                 </tbody>
