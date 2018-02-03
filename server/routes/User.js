@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 module.exports = function(app){
 
     //get all users
-    app.get('/api/user',function(req,res){
+    app.get('/user',function(req,res){
         User.find(function(error,users){
             if (error){
                 res.send(error);
@@ -15,7 +15,7 @@ module.exports = function(app){
     });
 
     //get a single user by their username
-    app.get('/api/user/:username',function(req,res){
+    app.get('/user/:username',function(req,res){
         User.findByUsername(req.params.username).then(function(user){
             res.json(user);
         },function(error){
@@ -24,7 +24,7 @@ module.exports = function(app){
     });
 
     //create a user
-    app.post('/api/user',function(req,res){
+    app.post('/user',function(req,res){
         User.create({
             username:req.body.username,
             usernameLowerCase:req.body.username.toLowerCase(),
@@ -46,7 +46,7 @@ module.exports = function(app){
 
     //update a user using the user's id
     //currently only first and lastname are changeable
-    app.put('/api/user',function(req,res){
+    app.put('/user',function(req,res){
         User.findByIdAndUpdate(
             mongoose.Types.ObjectId(req.body.id),
             {
@@ -69,7 +69,7 @@ module.exports = function(app){
     });
 
     //delete a user
-    app.delete('/api/user',function(req,res){
+    app.delete('/user',function(req,res){
         User.findByIdAndDelete(
             req.body.id,
             function(error){

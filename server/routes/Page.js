@@ -6,7 +6,7 @@ var Page = require('../schemas/PageSchema.js');
 module.exports = function(app){
 
     //get all pages for a book by it's id
-    app.get('/api/book/:id/pages',function(req,res){
+    app.get('/book/:id/pages',function(req,res){
         Page.findByBookId(req.params.id)
             .then(function(pages){
                 res.json(pages);
@@ -16,7 +16,7 @@ module.exports = function(app){
     });
 
     //create a new page
-    app.post('/api/book/pages',function(req,res){
+    app.post('/book/pages',function(req,res){
         Book.findById(req.body.bookId)
             .then(function(book){
                 Page.findByBookId(book._id)
@@ -40,7 +40,7 @@ module.exports = function(app){
             });
     });
 
-    app.put('/api/book/pages',function(req,res){
+    app.put('/book/pages',function(req,res){
         Page.findByIdAndUpdate(
             mongoose.Types.ObjectId(req.body.id),
             {

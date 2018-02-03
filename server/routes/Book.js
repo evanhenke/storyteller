@@ -5,7 +5,7 @@ var Page = require('../schemas/PageSchema.js');
 
 module.exports = function(app){
     //get all books... not sure why anyone would do this, it'd be a huge number
-    app.get('/api/book',function(req,res){
+    app.get('/book',function(req,res){
         Book.find(function(error,books){
             if(error){
                 res.send(error);
@@ -16,7 +16,7 @@ module.exports = function(app){
     });
 
     //get all books by an author's username
-    app.get('/api/book/:username',function(req,res){
+    app.get('/book/:username',function(req,res){
         User.findByUsername(req.params.username)
             .then(function(user){
                 Book.findByAuthorId(user._id).then(function(books){
@@ -30,7 +30,7 @@ module.exports = function(app){
     });
 
     //create a book for a user
-    app.post('/api/book',function(req,res){
+    app.post('/book',function(req,res){
         User.findByUsername(req.body.username).then(function(author){
             Book.create({
                 title:req.body.title,
@@ -58,7 +58,7 @@ module.exports = function(app){
     });
 
     //update book
-    app.put('/api/book',function(req,res){
+    app.put('/book',function(req,res){
         Book.findByIdAndUpdate(
             mongoose.Types.ObjectId(req.body.id),
             {

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ng serve && node server"
+    "start": "concurrently \"nodemon server\" \"ng serve\""
   },
   "author": "Evan Henke",
   "license": "ISC",
@@ -23,6 +23,7 @@
     "@angular/router": "^5.2.0-rc.0",
     "body-parser": "^1.17.2",
     "bootstrap": "^4.0.0-alpha.6",
+    "cors": "^2.8.4",
     "express": "^4.15.3",
     "fs": "0.0.1-security",
     "graceful-fs": "^4.1.11",
@@ -31,6 +32,7 @@
     "nodemon": "^1.14.7"
   },
   "devDependencies": {
-    "@angular/cli": "^1.6.3"
+    "@angular/cli": "^1.6.3",
+    "concurrently": "^3.5.1"
   }
 }
